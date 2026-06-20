@@ -4,11 +4,13 @@ import {
   Server, Cloud, Network, Database, ShieldCheck, Headphones,
   Clock, Lock, TrendingUp, Zap, ArrowRight, ArrowUpRight,
   MapPin, Phone, Mail, Building2, Landmark, HeartPulse, ShoppingBag, Factory, GraduationCap,
+  CheckCircle, AlertCircle, Loader2,
 } from "lucide-react";
 import { QtechxLogo } from "@/components/QtechxLogo";
 import { useEffect, useState } from "react";
 import { useLottie } from "lottie-react";
 import animationData from "@/components/Animation - 1741463397139.json";
+import { submitContactForm } from "@/lib/contact-server";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -129,20 +131,20 @@ function Nav() {
 
 function Hero() {
   return (
-    <section id="top" className="relative pt-20 md:pt-44 pb-24 md:pb-32 px-6 overflow-hidden">
+    <section id="top" className="relative pt-16 md:pt-32 pb-16 md:pb-24 lg:pb-32 px-6 overflow-hidden">
       {/* Subtle ambient glow — very restrained */}
       <div className="absolute -top-40 -right-40 w-[500px] h-[500px] rounded-full bg-primary/[0.03] blur-[120px] pointer-events-none" />
       <div className="absolute top-20 -left-20 w-[300px] h-[300px] rounded-full bg-accent/[0.02] blur-[100px] pointer-events-none" />
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
-        <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
+        <div className="grid lg:grid-cols-2 gap-6 lg:gap-16 items-center">
           {/* Left: Content */}
           <div className="min-w-0">
             <motion.div
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
-              className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-white/[0.02] px-3 py-1 text-[11px] font-medium uppercase tracking-[0.15em] text-muted-foreground mb-8"
+              className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-white/[0.02] px-3 py-1 text-[11px] font-medium uppercase tracking-[0.15em] text-muted-foreground mb-5 sm:mb-8"
             >
               <span className="h-1 w-1 rounded-full bg-accent" />
               Enterprise IT Solutions
@@ -152,9 +154,9 @@ function Hero() {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.05 }}
-              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-semibold tracking-tight leading-[1.1] text-foreground break-words"
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-semibold tracking-tight leading-[1.15] text-foreground break-words"
             >
-              IT infrastructure 
+              IT infrastructure
                <br className="hidden sm:block" />
                {" "} that never{" "}
               <span className="relative inline-block">
@@ -178,7 +180,7 @@ function Hero() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.7, delay: 0.2 }}
-              className="mt-6 max-w-lg text-base md:text-lg text-muted-foreground leading-relaxed"
+              className="mt-4 sm:mt-6 max-w-lg text-sm sm:text-base md:text-lg text-muted-foreground leading-relaxed"
             >
               Managed IT, cloud, and security — built for businesses that demand uptime.
             </motion.p>
@@ -187,12 +189,12 @@ function Hero() {
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.35 }}
-              className="mt-10 flex flex-wrap items-center gap-3"
+              className="mt-6 sm:mt-10 flex flex-wrap items-center gap-3"
             >
-              <a href="#contact" className="group inline-flex items-center gap-2 rounded-full bg-foreground text-background px-5 py-2.5 text-sm font-medium hover:bg-foreground/90 transition-colors">
+              <a href="#contact" className="group inline-flex items-center gap-2 rounded-full bg-foreground text-background px-4 py-2 sm:px-5 sm:py-2.5 text-sm font-medium hover:bg-foreground/90 transition-colors">
                 Get consultation <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
               </a>
-              <a href="#services" className="inline-flex items-center gap-2 rounded-full border border-border px-5 py-2.5 text-sm font-medium text-foreground hover:bg-white/5 transition-colors">
+              <a href="#services" className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 sm:px-5 sm:py-2.5 text-sm font-medium text-foreground hover:bg-white/5 transition-colors">
                 Our services
               </a>
             </motion.div>
@@ -203,7 +205,7 @@ function Hero() {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
-            className="relative w-full max-w-sm sm:max-w-md mx-auto lg:ml-auto lg:mr-0 mt-10 lg:mt-0"
+            className="relative w-full max-w-[200px] sm:max-w-sm md:max-w-md mx-auto lg:ml-auto lg:mr-0 mt-6 sm:mt-8 lg:mt-0"
           >
             <LottieView />
           </motion.div>
@@ -303,6 +305,40 @@ function WhyUs() {
 }
 
 function Contact() {
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    message: "",
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatus("loading");
+    setErrorMessage("");
+
+    try {
+      const result = await submitContactForm({
+        data: formData,
+      });
+      if (result.success) {
+        setStatus("success");
+        setFormData({ name: "", email: "", message: "" });
+      }
+    } catch (error) {
+      setStatus("error");
+      setErrorMessage(error instanceof Error ? error.message : "Something went wrong. Please try again.");
+    }
+  };
+
+  const handleChange = (field: keyof typeof formData) => (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setFormData((prev) => ({ ...prev, [field]: e.target.value }));
+    if (status === "error") setStatus("idle");
+  };
+
   return (
     <section id="contact" className="relative py-28 px-6">
       <div className="mx-auto max-w-6xl">
@@ -319,13 +355,91 @@ function Contact() {
               <div className="flex gap-3"><Mail className="h-4 w-4 text-accent shrink-0 mt-1" strokeWidth={1.5} /><a href="mailto:hello@qtechx.com" className="text-muted-foreground hover:text-foreground">hello@qtechx.com</a></div>
             </div>
           </div>
-          <form onSubmit={e => { e.preventDefault(); }} className="lg:col-span-3 rounded-2xl border border-border/60 bg-surface/30 p-8 space-y-5">
-            <Field label="Name" id="name"><input id="name" required className="input-base" placeholder="Your full name" /></Field>
-            <Field label="Email" id="email"><input id="email" type="email" required className="input-base" placeholder="you@company.com" /></Field>
-            <Field label="Message" id="msg"><textarea id="msg" rows={5} required className="input-base resize-none" placeholder="Tell us about your project…" /></Field>
-            <button type="submit" className="inline-flex items-center gap-2 rounded-full bg-foreground text-background px-5 py-2.5 text-sm font-medium hover:bg-foreground/90 transition-colors">
-              Send message <ArrowRight className="h-4 w-4" />
-            </button>
+          <form onSubmit={handleSubmit} className="lg:col-span-3 rounded-2xl border border-border/60 bg-surface/30 p-8 space-y-5">
+            {status === "success" ? (
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex flex-col items-center justify-center py-12 text-center"
+              >
+                <div className="rounded-full bg-green-500/10 p-4 mb-4">
+                  <CheckCircle className="h-8 w-8 text-green-500" strokeWidth={2} />
+                </div>
+                <h3 className="text-lg font-semibold mb-2">Message Sent!</h3>
+                <p className="text-sm text-muted-foreground max-w-sm">Thank you for reaching out. Our team will get back to you within 24 hours.</p>
+                <button
+                  type="button"
+                  onClick={() => setStatus("idle")}
+                  className="mt-6 text-sm text-accent hover:text-accent/80 transition-colors"
+                >
+                  Send another message
+                </button>
+              </motion.div>
+            ) : (
+              <>
+                <Field label="Name" id="name">
+                  <input
+                    id="name"
+                    required
+                    className="input-base"
+                    placeholder="Your full name"
+                    value={formData.name}
+                    onChange={handleChange("name")}
+                    disabled={status === "loading"}
+                  />
+                </Field>
+                <Field label="Email" id="email">
+                  <input
+                    id="email"
+                    type="email"
+                    required
+                    className="input-base"
+                    placeholder="you@company.com"
+                    value={formData.email}
+                    onChange={handleChange("email")}
+                    disabled={status === "loading"}
+                  />
+                </Field>
+                <Field label="Message" id="msg">
+                  <textarea
+                    id="msg"
+                    rows={5}
+                    required
+                    className="input-base resize-none"
+                    placeholder="Tell us about your project…"
+                    value={formData.message}
+                    onChange={handleChange("message")}
+                    disabled={status === "loading"}
+                  />
+                </Field>
+                {status === "error" && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex items-center gap-2 text-sm text-red-400"
+                  >
+                    <AlertCircle className="h-4 w-4" strokeWidth={2} />
+                    <span>{errorMessage}</span>
+                  </motion.div>
+                )}
+                <button
+                  type="submit"
+                  disabled={status === "loading"}
+                  className="inline-flex items-center gap-2 rounded-full bg-foreground text-background px-5 py-2.5 text-sm font-medium hover:bg-foreground/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {status === "loading" ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Sending...
+                    </>
+                  ) : (
+                    <>
+                      Send message <ArrowRight className="h-4 w-4" />
+                    </>
+                  )}
+                </button>
+              </>
+            )}
           </form>
         </div>
       </div>
