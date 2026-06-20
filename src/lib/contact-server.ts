@@ -1,7 +1,19 @@
 import { createServerFn } from "@tanstack/react-start";
 
+interface ContactFormData {
+  name: string;
+  email: string;
+  message: string;
+}
+
+interface ContactFormResponse {
+  success: boolean;
+  message: string;
+}
+
 export const submitContactForm = createServerFn({ method: "POST" })
-  .validator((data: { name: string; email: string; message: string }) => {
+  .handler(async ({ data }: { data: ContactFormData }): Promise<ContactFormResponse> => {
+    // Validation
     if (!data.name || data.name.trim().length < 2) {
       throw new Error("Name must be at least 2 characters");
     }
@@ -11,9 +23,7 @@ export const submitContactForm = createServerFn({ method: "POST" })
     if (!data.message || data.message.trim().length < 10) {
       throw new Error("Message must be at least 10 characters");
     }
-    return data;
-  })
-  .handler(async ({ data }) => {
+
     // Simulate sending email or storing in database
     // In production, you would integrate with:
     // - Email service (SendGrid, Resend, AWS SES)
