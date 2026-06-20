@@ -374,7 +374,7 @@ function Footer() {
           <ul className="space-y-2 text-sm text-muted-foreground">
             <li>House #7 Block #1, Karim Park, Ravi Road, Lahore</li>
             <li>+92 324 4686837</li>
-            <li>info@qtechx.com</li>
+            <li>info@qtechx.expert</li>
           </ul>
         </div>
       </div>
