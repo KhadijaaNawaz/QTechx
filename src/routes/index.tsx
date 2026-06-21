@@ -352,7 +352,7 @@ function Contact() {
             <div className="space-y-4 text-sm">
               <div className="flex gap-3"><MapPin className="h-4 w-4 text-accent shrink-0 mt-1" strokeWidth={1.5} /><span className="text-muted-foreground">House #7 Block #1, Karim Park,<br /> Ravi Road, Lahore</span></div>
               <div className="flex gap-3"><Phone className="h-4 w-4 text-accent shrink-0 mt-1" strokeWidth={1.5} /><a href="tel:+923244686837" className="text-muted-foreground hover:text-foreground">+92 324 4686837</a></div>
-              <div className="flex gap-3"><Mail className="h-4 w-4 text-accent shrink-0 mt-1" strokeWidth={1.5} /><a href="mailto:hello@qtechx.com" className="text-muted-foreground hover:text-foreground">hello@qtechx.com</a></div>
+              <div className="flex gap-3"><Mail className="h-4 w-4 text-accent shrink-0 mt-1" strokeWidth={1.5} /><a href="mailto:info@qtechx.expert" className="text-muted-foreground hover:text-foreground">info@qtechx.expert</a></div>
             </div>
           </div>
           <form onSubmit={handleSubmit} className="lg:col-span-3 rounded-2xl border border-border/60 bg-surface/30 p-8 space-y-5">
